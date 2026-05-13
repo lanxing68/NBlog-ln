@@ -10,6 +10,12 @@
 					<div class="row m-padded-tb-small">
 						<h2 class="ui header m-center">{{ blog.title }}</h2>
 					</div>
+          <!--文章首图-->
+          <div class="m-padded-tb-large" v-if="blog.firstPicture">
+            <img :src="blog.firstPicture"
+                 alt="文章首图"
+                 style="width: 100%; border-radius: 10px;">
+          </div>
 					<!--文章简要信息-->
 					<div class="row m-padded-tb-small">
 						<div class="ui horizontal link list m-center">

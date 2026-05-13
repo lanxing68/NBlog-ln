@@ -24,10 +24,13 @@
 						<!--右侧-->
 						<div class="three wide column m-mobile-hide">
 							<RandomBlog :randomBlogList="randomBlogList" :class="{'m-display-none':focusMode}"/>
+							<HotBlog :hotBlogList="hotBlogList" :class="{'m-display-none':focusMode}"/>
 							<Tags :tagList="tagList" :class="{'m-display-none':focusMode}"/>
 							<!--只在文章页面显示目录-->
 							<Tocbot v-if="$route.name==='blog'"/>
 						</div>
+
+
 					</div>
 				</div>
 			</div>
@@ -57,6 +60,7 @@
 	import Introduction from "@/components/sidebar/Introduction";
 	import Tags from "@/components/sidebar/Tags";
 	import RandomBlog from "@/components/sidebar/RandomBlog";
+import HotBlog from "@/components/sidebar/HotBlog";
 	import Tocbot from "@/components/sidebar/Tocbot";
 	import BlogPasswordDialog from "@/components/index/BlogPasswordDialog";
 	import {mapState} from 'vuex'
@@ -64,7 +68,7 @@
 
 	export default {
 		name: "Index",
-		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction},
+		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction, HotBlog},
 		data() {
 			return {
 				siteInfo: {
@@ -78,6 +82,7 @@
 				randomBlogList: [],
 				badges: [],
 				newBlogList: [],
+				hotBlogList: [],
 				hitokoto: {},
 			}
 		},
@@ -108,6 +113,7 @@
 				getSite().then(res => {
 					if (res.code === 200) {
 						this.siteInfo = res.data.siteInfo
+            this.hotBlogList = res.data.hotBlogList
 						this.badges = res.data.badges
 						this.newBlogList = res.data.newBlogList
 						this.categoryList = res.data.categoryList

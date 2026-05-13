@@ -48,4 +48,8 @@ public interface RedisService {
 	boolean hasKey(String key);
 
 	void expire(String key, long time);
+    void incrementByZSet(String key, Object value, int increment);
+    List<Object> getTopByZSet(String key, int limit);
+    String getStringByKey(String key);
+    void saveStringWithExpireTime(String key, String value, long timeout,java.util.concurrent.TimeUnit timeUnit);
 }

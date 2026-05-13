@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Table structure for about
 -- ----------------------------
 DROP TABLE IF EXISTS `about`;
-CREATE TABLE `about`  (
+CREATE TABLE `about`  (login_logvisit_loguseruseruseruserusertaguser
   `id` bigint(0) NOT NULL,
   `name_en` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `name_zh` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -60,13 +60,19 @@ CREATE TABLE `blog_tag`  (
 
 -- ----------------------------
 -- Table structure for category
--- ----------------------------
+-- ----------------------------id
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+INSERT INTO `category` (`category_name`) VALUES
+('技术'),
+('生活'),
+('旅游'),
+('学习');
 
 -- ----------------------------
 -- Table structure for city_visitor
@@ -288,6 +294,18 @@ CREATE TABLE `tag`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+INSERT INTO `tag` (`tag_name`, `color`)
+VALUES 
+('Java', '#f89820'),
+('MySQL', '#4479a1'),
+('Vue', '#42b883'),
+('Python', '#3776ab'),
+('算法', '#9c27b0'),
+('日常随笔', '#00bcd4'),
+('面试经验', '#ff9800'),
+('学习笔记', '#8bc34a');
+
+
 -- ----------------------------
 -- Table structure for user
 -- ----------------------------
@@ -351,7 +369,7 @@ CREATE TABLE `visit_record`  (
 DROP TABLE IF EXISTS `visitor`;
 CREATE TABLE `visitor`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '访客标识码',
+  `uuid` varchar(36) CHARACTER SET utf8mb4 COLLATE utuseruserf8mb4_general_ci NOT NULL COMMENT '访客标识码',
   `ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'ip',
   `ip_source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'ip来源',
   `os` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '操作系统',

@@ -45,8 +45,8 @@ public class BlogController {
 	@VisitLogger(VisitBehavior.INDEX)
 	@GetMapping("/blogs")
 	public Result blogs(@RequestParam(defaultValue = "1") Integer pageNum) {
-		PageResult<BlogInfo> pageResult = blogService.getBlogInfoListByIsPublished(pageNum);
-		return Result.ok("请求成功", pageResult);
+        PageResult<BlogInfo> pageResult = blogService.getBlogInfoListByIsPublished(pageNum);
+        return Result.ok("请求成功", pageResult);
 	}
 
 	/**

@@ -84,4 +84,8 @@ public interface BlogMapper {
 	Boolean getPublishedByBlogId(Long blogId);
 
 	List<CategoryBlogCount> getCategoryBlogCountList();
+
+    NewBlog getNewBlogById(long l);
+
+    List<NewBlog> getNewBlogByIds(List<Object> blogIdList);
 }

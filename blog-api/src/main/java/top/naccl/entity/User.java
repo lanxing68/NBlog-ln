@@ -34,6 +34,8 @@ public class User implements UserDetails {
 	private Date createTime;
 	private Date updateTime;
 	private String role;
+    private String captchaId;
+    private String captchaCode;
 
 	@JsonIgnore
 	@Override

@@ -68,4 +68,8 @@ public interface BlogService {
 	Boolean getCommentEnabledByBlogId(Long blogId);
 
 	Boolean getPublishedByBlogId(Long blogId);
+    List<NewBlog> getHotBlogList();
+    boolean likeBlog(Long blogId, String visitorId);
+    int getBlogLikeCount(Long blogId);
+    boolean hasLikedBlog(Long blogId, String visitorId);
 }

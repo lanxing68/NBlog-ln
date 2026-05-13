@@ -49,6 +49,10 @@ public class IndexController {
 		map.put("categoryList", categoryList);
 		map.put("tagList", tagList);
 		map.put("randomBlogList", randomBlogList);
+        //在 site() 方法中调用 blogService.getHotBlogList()，放入返回 Map
+        List<NewBlog> hotBlogList = blogService.getHotBlogList();
+        map.put("hotBlogList", hotBlogList);
+
 		return Result.ok("请求成功", map);
 	}
 }

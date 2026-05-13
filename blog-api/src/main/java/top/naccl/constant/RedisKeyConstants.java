@@ -51,4 +51,13 @@ public class RedisKeyConstants {
 	 * QQ号与对应头像URL key
 	 */
 	public static final String QQ_AVATAR_URL_MAP = "qqAvatarUrlMap";
+    /**
+     * top10博客列表key
+     */
+    public static final String HOT_BLOG_LIST = "hotBlogList";
+
+    //登录验证码
+    public static final String CAPTCHA_PREFIX = "captcha:";
+    //文章点赞
+    public static final String BLOG_LIKE_PREFIX = "blogLike:";
 }

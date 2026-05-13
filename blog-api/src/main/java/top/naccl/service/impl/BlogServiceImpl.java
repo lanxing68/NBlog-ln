@@ -26,10 +26,7 @@ import top.naccl.util.JacksonUtils;
 import top.naccl.util.markdown.MarkdownUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description: 博客文章业务层实现
@@ -320,6 +317,8 @@ public class BlogServiceImpl implements BlogService {
 	@Override
 	public void updateViewsToRedis(Long blogId) {
 		redisService.incrementByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blogId, 1);
+        //- 同时在 updateViewsToRedis() 里给 ZSet 也 +1（浏览量越高越热门）}
+        redisService.incrementByZSet(RedisKeyConstants.HOT_BLOG_LIST, blogId, 1);
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -408,7 +407,46 @@ public class BlogServiceImpl implements BlogService {
 		return blogMapper.getPublishedByBlogId(blogId);
 	}
 
-	/**
+    @Override
+    public List<NewBlog> getHotBlogList() {
+        List<Object> blogIdList = redisService.getTopByZSet(RedisKeyConstants.HOT_BLOG_LIST, 10);
+        if (blogIdList.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<NewBlog> blogList = blogMapper.getNewBlogByIds(blogIdList);
+        // MySQL IN 查询不保证顺序，按 ZSet 返回的顺序重排
+        Map<Long, Integer> idOrderMap = new HashMap<>();
+        for (int i = 0; i < blogIdList.size(); i++) {
+            idOrderMap.put(((Number) blogIdList.get(i)).longValue(), i);
+        }
+        for (NewBlog blog : blogList) {
+            if (!"".equals(blog.getPassword())) {
+                blog.setPrivacy(true);
+                blog.setPassword("");
+            } else {
+                blog.setPrivacy(false);
+            }
+        }
+        blogList.sort(Comparator.comparingInt(b -> idOrderMap.getOrDefault(b.getId(), Integer.MAX_VALUE)));
+        return blogList;
+    }
+
+    @Override
+    public boolean likeBlog(Long blogId, String visitorId) {
+        return false;
+    }
+
+    @Override
+    public int getBlogLikeCount(Long blogId) {
+        return 0;
+    }
+
+    @Override
+    public boolean hasLikedBlog(Long blogId, String visitorId) {
+        return false;
+    }
+
+    /**
 	 * 删除首页缓存、最新推荐缓存、归档页面缓存、博客浏览量缓存
 	 */
 	private void deleteBlogRedisCache() {

@@ -8,8 +8,10 @@ import top.naccl.model.vo.PageResult;
 import top.naccl.service.RedisService;
 import top.naccl.util.JacksonUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -75,6 +77,7 @@ public class RedisServiceImpl implements RedisService {
 	@Override
 	public <T> void saveListToValue(String key, List<T> list) {
 		jsonRedisTemplate.opsForValue().set(key, list);
+        expire(key, 3600);
 	}
 
 	@Override
@@ -142,4 +145,27 @@ public class RedisServiceImpl implements RedisService {
 	public void expire(String key, long time) {
 		jsonRedisTemplate.expire(key, time, TimeUnit.SECONDS);
 	}
+
+    @Override
+    public void incrementByZSet(String key, Object value, int increment) {
+        jsonRedisTemplate.opsForZSet().incrementScore(key, value, increment);
+    }
+
+    @Override
+    public List<Object> getTopByZSet(String key, int limit) {
+        Set<Object> result = jsonRedisTemplate.opsForZSet().reverseRange(key, 0, limit - 1);
+        return result == null ? new ArrayList<>() : new ArrayList<>(result);
+    }
+
+    @Override
+    public String getStringByKey(String key) {
+        Object redisResult = jsonRedisTemplate.opsForValue().get(key);
+        return redisResult == null ? null : redisResult.toString();
+
+    }
+
+    @Override
+    public void saveStringWithExpireTime(String key, String value, long timeout, TimeUnit timeUnit) {
+        jsonRedisTemplate.opsForValue().set(key, value,timeout,timeUnit);
+    }
 }

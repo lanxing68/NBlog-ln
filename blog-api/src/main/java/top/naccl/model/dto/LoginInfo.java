@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+
 /**
  * @Description: 登录账号密码
  * @Author: Naccl
@@ -17,4 +18,8 @@ import lombok.ToString;
 public class LoginInfo {
 	private String username;
 	private String password;
+    private String captchaId;
+    private String captchaCode;
+
+
 }

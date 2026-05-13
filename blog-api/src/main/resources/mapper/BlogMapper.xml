@@ -321,4 +321,18 @@
     <select id="getCategoryBlogCountList" resultMap="categoryBlogCount">
         select category_id, count(category_id) as blog_count from blog group by category_id
     </select>
+    <select id="getNewBlogById" resultMap="newBlog">
+        select id, title, password
+        from blog
+        where id=#{id} and is_published=true
+    </select>
+    <select id="getNewBlogByIds" resultMap="newBlog">
+        select id, title, password
+        from blog
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and is_published=true
+    </select>
 </mapper>

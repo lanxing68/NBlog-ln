@@ -39,13 +39,22 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"/>
         </span>
 			</el-form-item>
-			<el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+
+
+      <el-form-item prop="captchaCode">
+        <el-input v-model="loginForm.captchaCode" placeholder="验证码" style="width:60%">
+        </el-input>
+        <img :src="captchaImage" @click="refreshCaptcha"
+             style="cursor:pointer;height:40px;vertical-align:middle;margin-left:10px">
+      </el-form-item>
+
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 		</el-form>
 	</div>
 </template>
 
 <script>
-	import {login} from "@/api/login";
+	import {login, getCaptcha} from "@/api/login";
 
 	export default {
 		name: 'Login',
@@ -53,8 +62,11 @@
 			return {
 				loginForm: {
 					username: '',
-					password: ''
+					password: '',
+					captchaCode: '',
 				},
+				captchaId: '',
+				captchaImage: '',
 				loginRules: {
 					username: [
 						{required: true, message: '请输入用户名', trigger: 'blur'},
@@ -67,6 +79,9 @@
 				passwordType: 'password',
 			}
 		},
+    created() {
+      this.refreshCaptcha()
+    },
 		methods: {
 			showPwd() {
 				if (this.passwordType === 'password') {
@@ -78,11 +93,17 @@
 					this.$refs.password.focus()
 				})
 			},
-			handleLogin() {
+
+      handleLogin() {
 				this.$refs.loginForm.validate(valid => {
 					if (valid) {
 						this.loading = true
-						login(this.loginForm).then(res => {
+						login({
+							username: this.loginForm.username,
+							password: this.loginForm.password,
+							captchaId: this.captchaId,
+							captchaCode: this.loginForm.captchaCode,
+						}).then(res => {
 							this.msgSuccess(res.msg);
 							window.localStorage.setItem('token', res.data.token)
 							window.localStorage.setItem('user', JSON.stringify(res.data.user))
@@ -91,9 +112,16 @@
 						this.loading = false
 					}
 				})
-			}
-		}
-	}
+			},
+
+      refreshCaptcha() {
+        getCaptcha().then(data => {
+          this.captchaId = data.captchaId;
+          this.captchaImage = data.captchaImage;
+        })
+      }
+    }
+  }
 </script>
 
 <style lang="scss">
