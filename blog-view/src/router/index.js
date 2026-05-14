@@ -62,8 +62,16 @@ const routes = [
 				name: 'about',
 				component: () => import('@/views/about/About'),
 				meta: {title: '关于我'}
-			}
-		]
+			},
+            {
+                path: '/search',
+                name: 'search',
+                component: () => import('@/views/search/Search'),
+                meta: { title: '搜索' }
+            }
+
+
+        ]
 	}
 ]
 

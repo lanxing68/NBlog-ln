@@ -1,6 +1,7 @@
 package top.naccl.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import top.naccl.entity.Blog;
 import top.naccl.model.dto.BlogView;
@@ -88,4 +89,5 @@ public interface BlogMapper {
     NewBlog getNewBlogById(long l);
 
     List<NewBlog> getNewBlogByIds(List<Object> blogIdList);
+    List<BlogInfo> searchBlogByTitle(@Param("keyword") String keyword);
 }

@@ -1,12 +1,7 @@
 package top.naccl.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.naccl.annotation.VisitLogger;
 import top.naccl.constant.JwtConstants;
 import top.naccl.entity.User;
@@ -22,7 +17,9 @@ import top.naccl.service.impl.UserServiceImpl;
 import top.naccl.util.JwtUtils;
 import top.naccl.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 博客相关
@@ -129,4 +126,55 @@ public class BlogController {
 		List<SearchBlog> searchBlogs = blogService.getSearchBlogListByQueryAndIsPublished(query.trim());
 		return Result.ok("获取成功", searchBlogs);
 	}
+    @PostMapping("/blog/{id}/like")
+    public Result likeBlog(@PathVariable Long id,
+                           @RequestHeader(value = "identification", required = false) String visitorId) {
+        if (visitorId == null) {
+            return Result.error("请先访问网站获取访客标识");
+        }
+        boolean success = blogService.likeBlog(id, visitorId);
+        if (success) {
+            return Result.ok("点赞成功");
+        } else {
+            return Result.error("您已经点过赞了");
+        }
+    }
+
+    /**
+     * 获取点赞数和点赞状态
+     */
+    @GetMapping("/blog/{id}/like")
+    public Result getLikeInfo(@PathVariable Long id,
+                              @RequestHeader(value = "identification", required = false) String visitorId) {
+        int count = blogService.getBlogLikeCount(id);
+        boolean liked = visitorId != null && blogService.hasLikedBlog(id, visitorId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("count", count);
+        result.put("liked", liked);
+        return Result.ok("获取成功", result);
+    }
+
+    @GetMapping("/searchTitle")
+    public Result searchTitle(@RequestParam String keyword) {
+        if (keyword == null || keyword.trim().length() < 1) {
+            return Result.error("请输入搜索关键词");
+        }
+        if (keyword.length() > 20) {
+            return Result.error("关键词不能超过20个字符");
+        }
+        List<BlogInfo> list = blogService.searchBlogByTitle(keyword);
+        // 给返回结果加上高亮标记
+        for (BlogInfo blog : list) {
+            // 在标题中高亮关键词
+            String title = blog.getTitle();
+            title = title.replaceAll("(?i)(" + java.util.regex.Pattern.quote(keyword) + ")",
+                    "<mark>$1</mark>");
+            blog.setTitle(title);
+        }
+        return Result.ok("搜索成功", list);
+    }
+
+
+
+
 }

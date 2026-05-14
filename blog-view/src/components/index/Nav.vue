@@ -36,7 +36,16 @@
 					<span class="content">{{ item.content }}</span>
 				</template>
 			</el-autocomplete>
-			<button class="ui menu black icon button m-right-top m-mobile-show" @click="toggle">
+
+      <div class="ui search">
+        <div class="ui icon input">
+          <input class="prompt" type="text" v-model="keyword"
+                 @keyup.enter="search" placeholder="搜索文章标题...">
+          <i class="search icon" @click="search" style="cursor:pointer"></i>
+        </div>
+      </div>
+
+      <button class="ui menu black icon button m-right-top m-mobile-show" @click="toggle">
 				<i class="sidebar icon"></i>
 			</button>
 		</div>
@@ -136,7 +145,14 @@
 				if (item.id) {
 					this.$router.push(`/blog/${item.id}`)
 				}
-			}
+			},
+      search() {
+        if (!this.keyword || this.keyword.trim() === '') return
+        this.$router.push({ name: 'search', query: { keyword: this.keyword } })
+      }
+
+
+
 		}
 	}
 </script>

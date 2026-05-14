@@ -335,4 +335,14 @@
         </foreach>
         and is_published=true
     </select>
+    <select id="searchBlogByTitle" resultType="top.naccl.model.vo.BlogInfo">
+        select id, title, description, create_time, views, words, read_time, is_top, password
+        from blog
+        where is_published = true
+          and title like concat('%', #{keyword}, '%')
+        order by create_time desc
+            limit 20
+
+
+    </select>
 </mapper>

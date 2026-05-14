@@ -69,6 +69,7 @@
 						<div class="column m-padding-left-no">
 							<router-link :to="`/tag/${tag.name}`" class="ui tag label m-text-500 m-margin-small" :class="tag.color" v-for="(tag,index) in blog.tags" :key="index">{{ tag.name }}</router-link>
 						</div>
+
 					</div>
 				</div>
 			</div>
@@ -89,14 +90,22 @@
 			<CommentList :page="0" :blogId="blogId" v-if="blog.commentEnabled"/>
 			<h3 class="ui header" v-else>评论已关闭</h3>
 		</div>
-	</div>
+    <div class="blog-like">
+      <button @click="handleLike" :class="{liked: hasLiked}">
+        <i class="heart icon"></i> {{ likeCount }} 赞
+      </button>
+    </div>
+
+
+  </div>
 </template>
 
 <script>
-	import {getBlogById} from "@/api/blog";
+	import {getBlogById, likeBlog, getLikeInfo} from "@/api/blog";
 	import CommentList from "@/components/comment/CommentList";
 	import {mapState} from "vuex";
 	import {SET_FOCUS_MODE, SET_IS_BLOG_RENDER_COMPLETE} from '@/store/mutations-types';
+  import { addHistory } from '@/util/history'
 
 	export default {
 		name: "Blog",
@@ -105,8 +114,12 @@
 			return {
 				blog: {},
 				bigFontSize: false,
+        likeCount: 0,
+        hasLiked: false,
 			}
-		},
+
+
+    },
 		computed: {
 			blogId() {
 				return parseInt(this.$route.params.id)
@@ -146,6 +159,10 @@
 		},
 		created() {
 			this.getBlog()
+
+
+
+
 		},
 		methods: {
 			getBlog(id = this.blogId) {
@@ -157,6 +174,8 @@
 				getBlogById(token, id).then(res => {
 					if (res.code === 200) {
 						this.blog = res.data
+						addHistory(this.blog)
+							this.fetchLikeInfo()
 						document.title = this.blog.title + this.siteInfo.webTitleSuffix
 						//v-html渲染完毕后，渲染代码块样式
 						this.$nextTick(() => {
@@ -173,8 +192,31 @@
 			},
 			changeFocusMode() {
 				this.$store.commit(SET_FOCUS_MODE, !this.focusMode)
-			}
-		}
+			},
+      handleLike() {
+        let visitorId = localStorage.getItem('identification')
+        likeBlog(this.blog.id, visitorId).then(res => {
+          if (res.code === 200) {
+            this.hasLiked = true
+            this.likeCount++
+            this.$message.success('点赞成功')
+          } else {
+            this.$message.warning(res.msg)
+          }
+        })
+      },
+
+      fetchLikeInfo() {
+        let visitorId = localStorage.getItem('identification')
+        getLikeInfo(this.blog.id, visitorId).then(res => {
+          if (res.code === 200) {
+            this.likeCount = res.data.count
+            this.hasLiked = res.data.liked
+          }
+        })
+      }
+
+    }
 	}
 </script>
 

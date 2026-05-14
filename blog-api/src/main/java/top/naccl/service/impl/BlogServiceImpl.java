@@ -433,18 +433,35 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public boolean likeBlog(Long blogId, String visitorId) {
-        return false;
+        String redisKey = RedisKeyConstants.BLOG_LIKE_PREFIX + blogId;
+        // SADD 返回 1 表示添加成功（新点赞），返回 0 表示已存在（不能重复点赞）
+        if (redisService.hasValueInSet(redisKey, visitorId)) {
+            return false;  // 已经点过赞了
+        }
+        redisService.saveValueToSet(redisKey, visitorId);
+        return true;
     }
+
 
     @Override
     public int getBlogLikeCount(Long blogId) {
-        return 0;
+        return redisService.countBySet(RedisKeyConstants.BLOG_LIKE_PREFIX + blogId);
     }
 
     @Override
     public boolean hasLikedBlog(Long blogId, String visitorId) {
-        return false;
+        return redisService.hasValueInSet(RedisKeyConstants.BLOG_LIKE_PREFIX + blogId, visitorId);
     }
+
+    @Override
+    public List<BlogInfo> searchBlogByTitle(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return blogMapper.searchBlogByTitle(keyword);
+    }
+
+
 
     /**
 	 * 删除首页缓存、最新推荐缓存、归档页面缓存、博客浏览量缓存

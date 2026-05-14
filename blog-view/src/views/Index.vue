@@ -26,6 +26,7 @@
 							<RandomBlog :randomBlogList="randomBlogList" :class="{'m-display-none':focusMode}"/>
 							<HotBlog :hotBlogList="hotBlogList" :class="{'m-display-none':focusMode}"/>
 							<Tags :tagList="tagList" :class="{'m-display-none':focusMode}"/>
+              <HistoryBlog :class="{'m-display-none':focusMode}" />
 							<!--只在文章页面显示目录-->
 							<Tocbot v-if="$route.name==='blog'"/>
 						</div>
@@ -65,10 +66,11 @@ import HotBlog from "@/components/sidebar/HotBlog";
 	import BlogPasswordDialog from "@/components/index/BlogPasswordDialog";
 	import {mapState} from 'vuex'
 	import {SAVE_CLIENT_SIZE, SAVE_INTRODUCTION, SAVE_SITE_INFO, RESTORE_COMMENT_FORM} from "@/store/mutations-types";
+  import HistoryBlog from "@/components/sidebar/HistoryBlog";
 
 	export default {
 		name: "Index",
-		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction, HotBlog},
+		components: {Header, BlogPasswordDialog, Tocbot, RandomBlog, Tags, Nav, Footer, Introduction, HotBlog, HistoryBlog},
 		data() {
 			return {
 				siteInfo: {
@@ -84,6 +86,7 @@ import HotBlog from "@/components/sidebar/HotBlog";
 				newBlogList: [],
 				hotBlogList: [],
 				hitokoto: {},
+
 			}
 		},
 		computed: {
@@ -98,6 +101,7 @@ import HotBlog from "@/components/sidebar/HotBlog";
 		created() {
 			this.getSite()
 			this.getHitokoto()
+
 			//从localStorage恢复之前的评论信息
 			this.$store.commit(RESTORE_COMMENT_FORM)
 		},

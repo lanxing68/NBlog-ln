@@ -72,4 +72,5 @@ public interface BlogService {
     boolean likeBlog(Long blogId, String visitorId);
     int getBlogLikeCount(Long blogId);
     boolean hasLikedBlog(Long blogId, String visitorId);
+    List<BlogInfo> searchBlogByTitle(String keyword);
 }

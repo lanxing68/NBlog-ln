@@ -31,4 +31,21 @@ export function getSearchBlogList(query) {
 			query
 		}
 	})
+
+}
+export function likeBlog(id, visitorId) {
+    return axios({
+        url: 'blog/' + id + '/like',
+        method: 'POST',
+        headers: { identification: visitorId }
+    })
+}
+
+// 获取点赞信息
+export function getLikeInfo(id, visitorId) {
+    return axios({
+        url: 'blog/' + id + '/like',
+        method: 'GET',
+        headers: visitorId ? { identification: visitorId } : {}
+    })
 }
