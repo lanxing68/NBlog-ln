@@ -47,6 +47,8 @@
 					<router-link :to="`/category/${blog.category.name}`" class="ui orange large ribbon label" v-if="blog.category">
 						<i class="small folder open icon"></i><span class="m-text-500">{{ blog.category.name }}</span>
 					</router-link>
+					<!--AI摘要-->
+					<AISummary :blogId="blogId" />
 					<!--文章Markdown正文-->
 					<div class="typo js-toc-content m-padded-tb-small match-braces rainbow-braces" v-lazy-container="{selector: 'img'}" v-viewer :class="{'m-big-fontsize':bigFontSize}" v-html="blog.content"></div>
 					<!--赞赏-->
@@ -97,19 +99,22 @@
     </div>
 
 
+		<AIChat :blogId="blogId" />
   </div>
 </template>
 
 <script>
 	import {getBlogById, likeBlog, getLikeInfo} from "@/api/blog";
 	import CommentList from "@/components/comment/CommentList";
+	import AISummary from "@/components/blog/AISummary";
+	import AIChat from "@/components/blog/AIChat";
 	import {mapState} from "vuex";
 	import {SET_FOCUS_MODE, SET_IS_BLOG_RENDER_COMPLETE} from '@/store/mutations-types';
   import { addHistory } from '@/util/history'
 
 	export default {
 		name: "Blog",
-		components: {CommentList},
+		components: {CommentList, AISummary, AIChat},
 		data() {
 			return {
 				blog: {},
