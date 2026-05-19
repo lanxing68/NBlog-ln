@@ -27,6 +27,7 @@ import top.naccl.util.markdown.MarkdownUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description: 博客文章业务层实现
@@ -35,104 +36,137 @@ import java.util.*;
  */
 @Service
 public class BlogServiceImpl implements BlogService {
-	@Autowired
-	BlogMapper blogMapper;
-	@Autowired
-	TagService tagService;
-	@Autowired
-	RedisService redisService;
-	//随机博客显示5条
-	private static final int randomBlogLimitNum = 5;
-	//最新推荐博客显示3条
-	private static final int newBlogPageSize = 3;
-	//每页显示5条博客简介
-	private static final int pageSize = 5;
-	//博客简介列表排序方式
-	private static final String orderBy = "is_top desc, create_time desc";
-	//私密博客提示
-	private static final String PRIVATE_BLOG_DESCRIPTION = "此文章受密码保护！";
+    @Autowired
+    BlogMapper blogMapper;
+    @Autowired
+    TagService tagService;
+    @Autowired
+    RedisService redisService;
+    //随机博客显示5条
+    private static final int randomBlogLimitNum = 5;
+    //最新推荐博客显示3条
+    private static final int newBlogPageSize = 3;
+    //每页显示5条博客简介
+    private static final int pageSize = 5;
+    //博客简介列表排序方式
+    private static final String orderBy = "is_top desc, create_time desc";
+    //私密博客提示
+    private static final String PRIVATE_BLOG_DESCRIPTION = "此文章受密码保护！";
 
-	/**
-	 * 项目启动时，保存所有博客的浏览量到Redis
-	 */
-	@PostConstruct
-	private void saveBlogViewsToRedis() {
-		String redisKey = RedisKeyConstants.BLOG_VIEWS_MAP;
-		//Redis中没有存储博客浏览量的Hash
-		if (!redisService.hasKey(redisKey)) {
-			//从数据库中读取并存入Redis
-			Map<Long, Integer> blogViewsMap = getBlogViewsMap();
-			redisService.saveMapToHash(redisKey, blogViewsMap);
-		}
-	}
+    /**
+     * 项目启动时，保存所有博客的浏览量到Redis
+     */
+    @PostConstruct
+    private void saveBlogViewsToRedis() {
+        String redisKey = RedisKeyConstants.BLOG_VIEWS_MAP;
+        //Redis中没有存储博客浏览量的Hash
+        if (!redisService.hasKey(redisKey)) {
+            //从数据库中读取并存入Redis
+            Map<Long, Integer> blogViewsMap = getBlogViewsMap();
+            redisService.saveMapToHash(redisKey, blogViewsMap);
+        }
+    }
 
-	@Override
-	public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId) {
-		return blogMapper.getListByTitleAndCategoryId(title, categoryId);
-	}
+    @Override
+    public List<Blog> getListByTitleAndCategoryId(String title, Integer categoryId) {
+        return blogMapper.getListByTitleAndCategoryId(title, categoryId);
+    }
 
-	@Override
-	public List<SearchBlog> getSearchBlogListByQueryAndIsPublished(String query) {
-		List<SearchBlog> searchBlogs = blogMapper.getSearchBlogListByQueryAndIsPublished(query);
-		// 数据库的处理是不区分大小写的，那么这里的匹配串处理也应该不区分大小写，否则会出现不准确的结果
-		query = query.toUpperCase();
-		for (SearchBlog searchBlog : searchBlogs) {
-			String content = searchBlog.getContent().toUpperCase();
-			int contentLength = content.length();
-			int index = content.indexOf(query) - 10;
-			index = Math.max(index, 0);
-			int end = index + 21;//以关键字字符串为中心返回21个字
-			end = Math.min(end, contentLength - 1);
-			searchBlog.setContent(searchBlog.getContent().substring(index, end));
-		}
-		return searchBlogs;
-	}
+    @Override
+    public List<SearchBlog> getSearchBlogListByQueryAndIsPublished(String query) {
+        List<SearchBlog> searchBlogs = blogMapper.getSearchBlogListByQueryAndIsPublished(query);
+        // 数据库的处理是不区分大小写的，那么这里的匹配串处理也应该不区分大小写，否则会出现不准确的结果
+        query = query.toUpperCase();
+        for (SearchBlog searchBlog : searchBlogs) {
+            String content = searchBlog.getContent().toUpperCase();
+            int contentLength = content.length();
+            int index = content.indexOf(query) - 10;
+            index = Math.max(index, 0);
+            int end = index + 21;//以关键字字符串为中心返回21个字
+            end = Math.min(end, contentLength - 1);
+            searchBlog.setContent(searchBlog.getContent().substring(index, end));
+        }
+        return searchBlogs;
+    }
 
-	@Override
-	public List<Blog> getIdAndTitleList() {
-		return blogMapper.getIdAndTitleList();
-	}
+    @Override
+    public List<Blog> getIdAndTitleList() {
+        return blogMapper.getIdAndTitleList();
+    }
 
-	@Override
-	public List<NewBlog> getNewBlogListByIsPublished() {
-		String redisKey = RedisKeyConstants.NEW_BLOG_LIST;
-		List<NewBlog> newBlogListFromRedis = redisService.getListByValue(redisKey);
-		if (newBlogListFromRedis != null) {
-			return newBlogListFromRedis;
-		}
-		PageHelper.startPage(1, newBlogPageSize);
-		List<NewBlog> newBlogList = blogMapper.getNewBlogListByIsPublished();
-		for (NewBlog newBlog : newBlogList) {
-			if (!"".equals(newBlog.getPassword())) {
-				newBlog.setPrivacy(true);
-				newBlog.setPassword("");
-			} else {
-				newBlog.setPrivacy(false);
-			}
-		}
-		redisService.saveListToValue(redisKey, newBlogList);
-		return newBlogList;
-	}
+    @Override
+    public List<NewBlog> getNewBlogListByIsPublished() {
+        String redisKey = RedisKeyConstants.NEW_BLOG_LIST;
+        List<NewBlog> newBlogListFromRedis = redisService.getListByValue(redisKey);
+        if (newBlogListFromRedis != null) {
+            return newBlogListFromRedis;
+        }
+        PageHelper.startPage(1, newBlogPageSize);
+        List<NewBlog> newBlogList = blogMapper.getNewBlogListByIsPublished();
+        for (NewBlog newBlog : newBlogList) {
+            if (!"".equals(newBlog.getPassword())) {
+                newBlog.setPrivacy(true);
+                newBlog.setPassword("");
+            } else {
+                newBlog.setPrivacy(false);
+            }
+        }
+        redisService.saveListToValueWithRandomExpire(redisKey, newBlogList, 3600, 600);
+        return newBlogList;
+    }
 
-	@Override
-	public PageResult<BlogInfo> getBlogInfoListByIsPublished(Integer pageNum) {
-		String redisKey = RedisKeyConstants.HOME_BLOG_INFO_LIST;
-		//redis已有当前页缓存
-		PageResult<BlogInfo> pageResultFromRedis = redisService.getBlogInfoPageResultByHash(redisKey, pageNum);
-		if (pageResultFromRedis != null) {
-			setBlogViewsFromRedisToPageResult(pageResultFromRedis);
-			return pageResultFromRedis;
-		}
-		//redis没有缓存，从数据库查询，并添加缓存
-		PageHelper.startPage(pageNum, pageSize, orderBy);
-		List<BlogInfo> blogInfos = processBlogInfosPassword(blogMapper.getBlogInfoListByIsPublished());
-		PageInfo<BlogInfo> pageInfo = new PageInfo<>(blogInfos);
-		PageResult<BlogInfo> pageResult = new PageResult<>(pageInfo.getPages(), pageInfo.getList());
-		setBlogViewsFromRedisToPageResult(pageResult);
-		//添加首页缓存
-		redisService.saveKVToHash(redisKey, pageNum, pageResult);
-		return pageResult;
-	}
+    @Override
+    public PageResult<BlogInfo> getBlogInfoListByIsPublished(Integer pageNum) {
+        String redisKey = RedisKeyConstants.HOME_BLOG_INFO_LIST;
+        PageResult<BlogInfo> pageResultFromRedis = redisService.getBlogInfoPageResultByHash(redisKey, pageNum);
+        if (pageResultFromRedis != null) {
+            setBlogViewsFromRedisToPageResult(pageResultFromRedis);
+            return pageResultFromRedis;
+        }
+        // 缓存未命中，加互斥锁防缓存击穿
+        String lockKey = RedisKeyConstants.LOCK_PREFIX + redisKey + ":" + pageNum;
+        if (redisService.tryLock(lockKey, 5)) {
+            try {
+                // 双重检查：拿到锁后再查一次缓存，防止重复建缓存
+                PageResult<BlogInfo> doubleCheck = redisService.getBlogInfoPageResultByHash(redisKey, pageNum);
+                if (doubleCheck != null) {
+                    setBlogViewsFromRedisToPageResult(doubleCheck);
+                    return doubleCheck;
+                }
+                // 查 MySQL 重建缓存
+                PageResult<BlogInfo> pageResult = queryAndCachePage(pageNum, redisKey);
+                return pageResult;
+            } finally {
+                redisService.releaseLock(lockKey);
+            }
+        } else {
+            // 没拿到锁，等 50ms 后重试缓存
+            try { Thread.sleep(50); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            PageResult<BlogInfo> retry = redisService.getBlogInfoPageResultByHash(redisKey, pageNum);
+            if (retry != null) {
+                setBlogViewsFromRedisToPageResult(retry);
+                return retry;
+            }
+            // 降级：直接查 MySQL 返回，不写缓存
+            PageHelper.startPage(pageNum, pageSize, orderBy);
+            List<BlogInfo> blogInfos = processBlogInfosPassword(blogMapper.getBlogInfoListByIsPublished());
+            PageInfo<BlogInfo> pageInfo = new PageInfo<>(blogInfos);
+            PageResult<BlogInfo> pageResult = new PageResult<>(pageInfo.getPages(), pageInfo.getList());
+            setBlogViewsFromRedisToPageResult(pageResult);
+            return pageResult;
+        }
+    }
+
+    private PageResult<BlogInfo> queryAndCachePage(Integer pageNum, String redisKey) {
+        PageHelper.startPage(pageNum, pageSize, orderBy);
+        List<BlogInfo> blogInfos = processBlogInfosPassword(blogMapper.getBlogInfoListByIsPublished());
+        PageInfo<BlogInfo> pageInfo = new PageInfo<>(blogInfos);
+        PageResult<BlogInfo> pageResult = new PageResult<>(pageInfo.getPages(), pageInfo.getList());
+        setBlogViewsFromRedisToPageResult(pageResult);
+        redisService.saveKVToHash(redisKey, pageNum, pageResult);
+        return pageResult;
+    }
+
 
 	/**
 	 * 将pageResult中博客对象的浏览量设置为Redis中的最新值
@@ -458,7 +492,17 @@ public class BlogServiceImpl implements BlogService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return blogMapper.searchBlogByTitle(keyword);
+        String cacheKey = "search:" + keyword;
+        // 防穿透：空结果缓存在此，命中直接返回
+        if (redisService.isNullValue(cacheKey)) {
+            return new ArrayList<>();
+        }
+        List<BlogInfo> result = blogMapper.searchBlogByTitle(keyword);
+        // 防穿透：MySQL 为空时缓存空值，60 秒内不重复查库
+        if (result.isEmpty()) {
+            redisService.saveNullValue(cacheKey, 60, TimeUnit.SECONDS);
+        }
+        return result;
     }
 
 

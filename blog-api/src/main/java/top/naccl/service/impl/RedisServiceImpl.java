@@ -168,4 +168,41 @@ public class RedisServiceImpl implements RedisService {
     public void saveStringWithExpireTime(String key, String value, long timeout, TimeUnit timeUnit) {
         jsonRedisTemplate.opsForValue().set(key, value,timeout,timeUnit);
     }
+
+   // tryLock 用 SET key value NX EX seconds：
+    @Override
+    public boolean tryLock(String key, long expireSeconds) {
+        Boolean result = jsonRedisTemplate.opsForValue()
+                .setIfAbsent(key, "1", expireSeconds, TimeUnit.SECONDS);
+        return result != null && result;
+    }
+
+    //releaseLock：
+    @Override
+    public void releaseLock(String key) {
+        jsonRedisTemplate.delete(key);
+    }
+
+    //saveNullValue — 存一个短 TTL 的空标记：
+    @Override
+    public void saveNullValue(String key, long timeout, TimeUnit unit) {
+        jsonRedisTemplate.opsForValue().set(key, "NULL", timeout, unit);
+    }
+
+    //isNullValue：
+    @Override
+    public boolean isNullValue(String key) {
+        Object value = jsonRedisTemplate.opsForValue().get(key);
+        return "NULL".equals(value);
+    }
+
+    //saveListToValueWithRandomExpire — TTL 加随机值：
+    @Override
+    public <T> void saveListToValueWithRandomExpire(String key, List<T> list,
+                                                    long baseSeconds, long randomRange) {
+        jsonRedisTemplate.opsForValue().set(key, list);
+        long expireSeconds = baseSeconds + (long)(Math.random() * randomRange);
+        jsonRedisTemplate.expire(key, expireSeconds, TimeUnit.SECONDS);
+    }
+
 }

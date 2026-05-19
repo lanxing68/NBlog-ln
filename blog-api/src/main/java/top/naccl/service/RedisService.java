@@ -5,6 +5,7 @@ import top.naccl.model.vo.PageResult;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public interface RedisService {
 	PageResult<BlogInfo> getBlogInfoPageResultByHash(String hash, Integer pageNum);
@@ -52,4 +53,14 @@ public interface RedisService {
     List<Object> getTopByZSet(String key, int limit);
     String getStringByKey(String key);
     void saveStringWithExpireTime(String key, String value, long timeout,java.util.concurrent.TimeUnit timeUnit);
+    // 互斥锁（防击穿）
+    boolean tryLock(String key, long expireSeconds);
+    void releaseLock(String key);
+
+    // 存空值标记（防穿透）
+    void saveNullValue(String key, long timeout, TimeUnit unit);
+    boolean isNullValue(String key);
+
+    // 带随机过期时间的缓存写入（防雪崩）
+    <T> void saveListToValueWithRandomExpire(String key, List<T> list, long baseSeconds, long randomRange);
 }

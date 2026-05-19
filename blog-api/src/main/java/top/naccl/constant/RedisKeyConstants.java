@@ -60,4 +60,9 @@ public class RedisKeyConstants {
     public static final String CAPTCHA_PREFIX = "captcha:";
     //文章点赞
     public static final String BLOG_LIKE_PREFIX = "blogLike:";
+    /** 缓存击穿防护：互斥锁 key 前缀 */
+    public static final String LOCK_PREFIX = "lock:";
+    /** 缓存穿透防护：空值标记 */
+    public static final String NULL_VALUE = "NULL";
+
 }
