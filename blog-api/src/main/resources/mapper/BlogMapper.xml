@@ -345,4 +345,13 @@
 
 
     </select>
+    <select id="getRelatedBlogs" resultMap="newBlog">
+        SELECT id, title, password
+        FROM blog
+        WHERE category_id = #{categoryId}
+          AND id != #{id}
+          AND is_published = true
+        ORDER BY create_time DESC
+            LIMIT 5
+    </select>
 </mapper>

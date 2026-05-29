@@ -21,11 +21,10 @@ public class WebConfig implements WebMvcConfigurer {
 	@Autowired
 	UploadProperties uploadProperties;
 
-	/**
-	 * 跨域请求
-	 *
-	 * @param registry
-	 */
+    //跨域请求
+     //@param registry
+
+   // @param
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
@@ -35,11 +34,11 @@ public class WebConfig implements WebMvcConfigurer {
 				.maxAge(3600);
 	}
 
-	/**
-	 * 请求拦截器
-	 *
-	 * @param registry
-	 */
+
+	 //请求拦截器
+
+	 //@param registry
+
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(accessLimitInterceptor);

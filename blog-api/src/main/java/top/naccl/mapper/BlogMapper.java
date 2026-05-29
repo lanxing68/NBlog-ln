@@ -90,4 +90,5 @@ public interface BlogMapper {
 
     List<NewBlog> getNewBlogByIds(List<Object> blogIdList);
     List<BlogInfo> searchBlogByTitle(@Param("keyword") String keyword);
+    List<NewBlog> getRelatedBlogs(Long id, Long categoryId);
 }

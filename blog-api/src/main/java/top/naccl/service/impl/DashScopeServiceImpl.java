@@ -93,6 +93,7 @@ public class DashScopeServiceImpl implements DashScopeService {
 		}
 
 		try {
+            //请求头
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.setBearerAuth(aiProperties.getApiKey());
@@ -107,14 +108,15 @@ public class DashScopeServiceImpl implements DashScopeService {
 			userMsg.put("role", "user");
 			userMsg.put("content", userMessage);
 			messages.add(userMsg);
-
+            //请求体
 			Map<String, Object> body = new HashMap<>();
 			body.put("model", aiProperties.getModel());
 			body.put("messages", messages);
 			body.put("temperature", aiProperties.getTemperature());
 			body.put("max_tokens", aiProperties.getMaxTokens());
-
+            //定义实体
 			HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            //发送请求并接收响应  restTemplate.postForObject(API_URL, request, Map.class) = 发一个 POST 请求，把返回的 JSON 自动转成 Map，让你直接用 map.get("choices") 拿数据。
 			Map<String, Object> response = restTemplate.postForObject(API_URL, request, Map.class);
 
 			if (response != null) {

@@ -12,6 +12,19 @@ export function getBlogById(token, id) {
 		}
 	})
 }
+ export function getRelatedBlogs(id, categoryId){
+    return axios({
+        url:'blog/related',
+        method:'GET',
+        params:{
+            id,categoryId
+        }
+
+    })
+
+
+}
+
 
 export function checkBlogPassword(blogPasswordForm) {
 	return axios({

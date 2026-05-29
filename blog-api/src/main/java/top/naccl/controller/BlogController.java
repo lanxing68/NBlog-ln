@@ -90,6 +90,13 @@ public class BlogController {
 		blogService.updateViewsToRedis(id);
 		return Result.ok("获取成功", blog);
 	}
+//同类推荐
+    @GetMapping("/blog/related")
+    public Result relatedBlogs(@RequestParam long id,@RequestParam long categoryId) {
+        blogService.getRelatedBlogs(id, categoryId);
+        return Result.ok("获取成功");
+
+    }
 
 	/**
 	 * 校验受保护文章密码是否正确，正确则返回jwt

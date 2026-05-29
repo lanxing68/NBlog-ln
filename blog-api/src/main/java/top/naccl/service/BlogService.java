@@ -51,6 +51,7 @@ public interface BlogService {
 
 	Blog getBlogById(Long id);
 
+
 	String getTitleByBlogId(Long id);
 
 	BlogDetail getBlogByIdAndIsPublished(Long id);
@@ -73,4 +74,5 @@ public interface BlogService {
     int getBlogLikeCount(Long blogId);
     boolean hasLikedBlog(Long blogId, String visitorId);
     List<BlogInfo> searchBlogByTitle(String keyword);
+    List<NewBlog> getRelatedBlogs(Long id, Long categoryId);
 }

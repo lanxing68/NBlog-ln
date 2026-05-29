@@ -505,6 +505,10 @@ public class BlogServiceImpl implements BlogService {
         return result;
     }
 
+    @Override
+    public List<NewBlog> getRelatedBlogs(Long id, Long categoryId) {
+        return blogMapper.getRelatedBlogs(id, categoryId);
+    }
 
 
     /**
