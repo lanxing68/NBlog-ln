@@ -85,11 +85,12 @@
         <id property="id" column="id"/>
         <result property="title" column="title"/>
         <result property="password" column="password"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <!--查询最新公开博客-->
     <select id="getNewBlogListByIsPublished" resultMap="newBlog">
-        select id, title, password
+        select id, title, password,create_time
         from blog
         where is_published=true
         order by create_time desc
@@ -182,8 +183,24 @@
     </delete>
 
     <!--维护 blog_tag 表(删除)-->
+    <delete id="deleteBlogByIds">
+        delete from blog where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--维护 blog_tag 表(删除)-->
     <delete id="deleteBlogTagByBlogId">
         delete from blog_tag where blog_id=#{blogId}
+    </delete>
+
+    <!--维护 blog_tag 表(批量删除)-->
+    <delete id="deleteBlogTagByBlogIds">
+        delete from blog_tag where blog_id in
+        <foreach collection="list" item="blogId" open="(" separator="," close=")">
+            #{blogId}
+        </foreach>
     </delete>
 
     <!--维护 blog_tag 表(添加)-->

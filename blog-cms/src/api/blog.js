@@ -20,6 +20,14 @@ export function deleteBlogById(id) {
 	})
 }
 
+export function deleteBatchBlogs(ids) {
+	return axios({
+		url: 'blog/batch',
+		method: 'DELETE',
+		data: ids
+	})
+}
+
 export function getCategoryAndTag() {
 	return axios({
 		url: 'categoryAndTag',

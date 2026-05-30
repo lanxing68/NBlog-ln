@@ -48,7 +48,11 @@ public interface BlogMapper {
 
 	int deleteBlogById(Long id);
 
+	int deleteBlogByIds(List<Long> ids);
+
 	int deleteBlogTagByBlogId(Long blogId);
+
+	int deleteBlogTagByBlogIds(List<Long> blogIds);
 
 	int saveBlog(top.naccl.model.dto.Blog blog);
 

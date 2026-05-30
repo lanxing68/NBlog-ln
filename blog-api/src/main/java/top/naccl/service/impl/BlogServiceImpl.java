@@ -304,6 +304,21 @@ public class BlogServiceImpl implements BlogService {
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
+	public void deleteBlogByIds(List<Long> ids) {
+		blogMapper.deleteBlogByIds(ids);
+		for (Long id : ids) {
+			redisService.deleteByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, id);
+		}
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public void deleteBlogTagByBlogIds(List<Long> blogIds) {
+		blogMapper.deleteBlogTagByBlogIds(blogIds);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
 	public void saveBlog(top.naccl.model.dto.Blog blog) {
 		if (blogMapper.saveBlog(blog) != 1) {
 			throw new PersistenceException("添加博客失败");

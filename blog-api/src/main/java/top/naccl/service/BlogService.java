@@ -33,7 +33,11 @@ public interface BlogService {
 
 	void deleteBlogById(Long id);
 
+	void deleteBlogByIds(List<Long> ids);
+
 	void deleteBlogTagByBlogId(Long blogId);
+
+	void deleteBlogTagByBlogIds(List<Long> blogIds);
 
 	void saveBlog(top.naccl.model.dto.Blog blog);
 

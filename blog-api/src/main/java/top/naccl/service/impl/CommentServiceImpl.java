@@ -124,6 +124,12 @@ public class CommentServiceImpl implements CommentService {
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
+	public void deleteCommentsByBlogIds(List<Long> blogIds) {
+		commentMapper.deleteCommentsByBlogIds(blogIds);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
 	public void updateComment(Comment comment) {
 		if (commentMapper.updateComment(comment) != 1) {
 			throw new PersistenceException("评论修改失败");

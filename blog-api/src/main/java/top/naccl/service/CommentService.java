@@ -20,6 +20,8 @@ public interface CommentService {
 
 	void deleteCommentsByBlogId(Long blogId);
 
+	void deleteCommentsByBlogIds(List<Long> blogIds);
+
 	void updateComment(Comment comment);
 
 	int countByPageAndIsPublished(Integer page, Long blogId, Boolean isPublished);

@@ -31,6 +31,8 @@ public interface CommentMapper {
 
 	int deleteCommentsByBlogId(Long blogId);
 
+	int deleteCommentsByBlogIds(List<Long> blogIds);
+
 	int updateComment(Comment comment);
 
 	int countByPageAndIsPublished(Integer page, Long blogId, Boolean isPublished);

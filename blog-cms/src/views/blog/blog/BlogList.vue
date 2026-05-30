@@ -10,9 +10,15 @@
 					<el-button slot="append" icon="el-icon-search" @click="search"></el-button>
 				</el-input>
 			</el-col>
+			<el-col :span="4" :offset="12" style="text-align:right">
+				<el-button type="danger" icon="el-icon-delete" size="small" @click="batchDelete" :disabled="multipleSelection.length===0">
+					批量删除
+				</el-button>
+			</el-col>
 		</el-row>
 
-		<el-table :data="blogList">
+		<el-table :data="blogList" @selection-change="handleSelectionChange">
+			<el-table-column type="selection" width="50"></el-table-column>
 			<el-table-column label="序号" type="index" width="50"></el-table-column>
 			<el-table-column label="标题" prop="title" show-overflow-tooltip></el-table-column>
 			<el-table-column label="分类" prop="category.name" width="150"></el-table-column>
@@ -97,7 +103,7 @@
 
 <script>
 	import Breadcrumb from "@/components/Breadcrumb";
-	import {getDataByQuery, deleteBlogById, updateTop, updateRecommend, updateVisibility} from '@/api/blog'
+	import {getDataByQuery, deleteBlogById, deleteBatchBlogs, updateTop, updateRecommend, updateVisibility} from '@/api/blog'
 
 	export default {
 		name: "BlogList",
@@ -113,6 +119,7 @@
 				blogList: [],
 				categoryList: [],
 				total: 0,
+				multipleSelection: [],
 				dialogVisible: false,
 				blogId: 0,
 				radio: 1,
@@ -212,6 +219,31 @@
 					dangerouslyUseHTMLString: true
 				}).then(() => {
 					deleteBlogById(id).then(res => {
+						this.msgSuccess(res.msg)
+						this.getData()
+					})
+				}).catch(() => {
+					this.$message({
+						type: 'info',
+						message: '已取消删除'
+					})
+				})
+			},
+			handleSelectionChange(val) {
+				this.multipleSelection = val
+			},
+			batchDelete() {
+				if (this.multipleSelection.length === 0) {
+					this.msgError('请先选择要删除的文章')
+					return
+				}
+				this.$confirm(`确定要删除选中的 ${this.multipleSelection.length} 篇文章及其所有评论吗？`, '提示', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'warning'
+				}).then(() => {
+					const ids = this.multipleSelection.map(item => item.id)
+					deleteBatchBlogs(ids).then(res => {
 						this.msgSuccess(res.msg)
 						this.getData()
 					})

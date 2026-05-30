@@ -54,6 +54,13 @@ export function likeBlog(id, visitorId) {
     })
 }
 
+export function getSearchHistory() {
+    return axios({
+        url: 'searchHistory',
+        method: 'GET'
+    })
+}
+
 // 获取点赞信息
 export function getLikeInfo(id, visitorId) {
     return axios({

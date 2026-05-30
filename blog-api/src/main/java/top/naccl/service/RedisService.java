@@ -63,4 +63,8 @@ public interface RedisService {
 
     // 带随机过期时间的缓存写入（防雪崩）
     <T> void saveListToValueWithRandomExpire(String key, List<T> list, long baseSeconds, long randomRange);
+    void lPushToList(String key, String value);
+    List<String> lRangeList(String key, int count);
+    void lPushWithLimit(String key, String value, int limit, long timeout, TimeUnit unit);
+
 }

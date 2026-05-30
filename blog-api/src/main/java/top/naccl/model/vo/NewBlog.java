@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Date;
+
 /**
  * @Description: 最新推荐博客
  * @Author: Naccl
@@ -19,4 +21,5 @@ public class NewBlog {
 	private String title;
 	private String password;
 	private Boolean privacy;
+    private Date createTime;
 }

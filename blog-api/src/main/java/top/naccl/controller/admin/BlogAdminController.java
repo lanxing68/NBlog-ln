@@ -88,6 +88,21 @@ public class BlogAdminController {
 	}
 
 	/**
+	 * 批量删除博客
+	 *
+	 * @param ids 文章id列表
+	 * @return
+	 */
+	@OperationLogger("批量删除博客")
+	@DeleteMapping("/blog/batch")
+	public Result deleteBatch(@RequestBody List<Long> ids) {
+		blogService.deleteBlogTagByBlogIds(ids);
+		blogService.deleteBlogByIds(ids);
+		commentService.deleteCommentsByBlogIds(ids);
+		return Result.ok("删除成功");
+	}
+
+	/**
 	 * 获取分类列表和标签列表
 	 *
 	 * @return

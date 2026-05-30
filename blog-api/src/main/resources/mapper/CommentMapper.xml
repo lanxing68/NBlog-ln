@@ -101,6 +101,14 @@
         delete from comment where blog_id=#{blogId}
     </delete>
 
+    <!--按博客id批量删除评论-->
+    <delete id="deleteCommentsByBlogIds">
+        delete from comment where blog_id in
+        <foreach collection="list" item="blogId" open="(" separator="," close=")">
+            #{blogId}
+        </foreach>
+    </delete>
+
     <!--更新评论-->
     <update id="updateComment">
         update comment set nickname=#{nickname}, avatar=#{avatar}, email=#{email}, ip=#{ip}, content=#{content}, website=#{website}

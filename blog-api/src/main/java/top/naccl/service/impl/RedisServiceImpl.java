@@ -1,6 +1,7 @@
 package top.naccl.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import top.naccl.model.vo.BlogInfo;
@@ -8,10 +9,7 @@ import top.naccl.model.vo.PageResult;
 import top.naccl.service.RedisService;
 import top.naccl.util.JacksonUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -194,6 +192,23 @@ public class RedisServiceImpl implements RedisService {
     public boolean isNullValue(String key) {
         Object value = jsonRedisTemplate.opsForValue().get(key);
         return "NULL".equals(value);
+    }
+
+    @Override
+    public void lPushToList(String key, String value) {
+        jsonRedisTemplate.opsForList().rightPush(key, value);
+    }
+
+    @Override
+    public List<String> lRangeList(String key, int count) {
+        return (List<String>) (List) jsonRedisTemplate.opsForList().range(key, 0, count - 1);
+    }
+
+    @Override
+    public void lPushWithLimit(String key, String value, int limit, long timeout, TimeUnit unit) {
+        jsonRedisTemplate.opsForList().leftPush(key, value);
+        jsonRedisTemplate.opsForList().trim(key, 0, limit - 1);
+        jsonRedisTemplate.expire(key, timeout, unit);
     }
 
     //saveListToValueWithRandomExpire — TTL 加随机值：
