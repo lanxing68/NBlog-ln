@@ -364,10 +364,13 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
-	public void updateViewsToRedis(Long blogId) {
-		redisService.incrementByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blogId, 1);
-        //- 同时在 updateViewsToRedis() 里给 ZSet 也 +1（浏览量越高越热门）}
-        redisService.incrementByZSet(RedisKeyConstants.HOT_BLOG_LIST, blogId, 1);
+	public void updateViewsToRedis(Long blogId, String visitorId) {
+		String dedupKey = RedisKeyConstants.BLOG_VIEWS_MAP + ":dedup:" + blogId + ":" + visitorId;
+		if (!redisService.hasKey(dedupKey)) {
+			redisService.incrementByHashKey(RedisKeyConstants.BLOG_VIEWS_MAP, blogId, 1);
+			redisService.incrementByZSet(RedisKeyConstants.HOT_BLOG_LIST, blogId, 1);
+			redisService.saveStringWithExpireTime(dedupKey, "1", 30, java.util.concurrent.TimeUnit.MINUTES);
+		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)

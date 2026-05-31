@@ -3,6 +3,8 @@ package top.naccl.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import top.naccl.annotation.VisitLogger;
 import top.naccl.constant.JwtConstants;
 import top.naccl.entity.User;
@@ -19,6 +21,7 @@ import top.naccl.service.impl.UserServiceImpl;
 import top.naccl.util.JwtUtils;
 import top.naccl.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +96,9 @@ public class BlogController {
             }
             blog.setPassword("");
         }
-        blogService.updateViewsToRedis(id);
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String identification = request.getHeader("identification");
+        blogService.updateViewsToRedis(id, identification);
         return Result.ok("获取成功", blog);
     }
 

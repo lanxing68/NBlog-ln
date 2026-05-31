@@ -49,7 +49,7 @@ public interface BlogService {
 
 	void updateBlogTopById(Long blogId, Boolean top);
 
-	void updateViewsToRedis(Long blogId);
+	void updateViewsToRedis(Long blogId, String visitorId);
 
 	void updateViews(Long blogId, Integer views);
 
